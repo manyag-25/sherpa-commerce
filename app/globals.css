@@ -209,6 +209,60 @@
     background-size: 34px 34px;
   }
 
+  /*
+   * Canvas for the exchange visualisation on /customer.
+   *
+   * The grid lattice alone read as graph paper: correct for a technical
+   * surface, but the one screen where three merchant agents compete for a
+   * buyer deserves to look like the centrepiece it is. The three stops are the
+   * three merchant hues (220 Sherpa / 178 Bizgram / 340 Challenger), placed so
+   * each sits roughly over its own column, so the wash is the story rather
+   * than decoration.
+   *
+   * Stops sit at 92-93% lightness. Below that the section labels that sit
+   * directly on the canvas start to suffer; above it the wash disappears
+   * behind the opaque white panels and stops reading as a colour at all.
+   * See the label rule below, which pays for this.
+   *
+   * One declaration rather than absolutely-positioned layers because this
+   * element scrolls: `background-attachment: scroll` pins the paint to the
+   * element's own box, so the wash stays put while the panels move over it. An
+   * `inset-0` child would scroll away after one viewport.
+   *
+   * Grid lines are listed first because in `background-image` the first layer
+   * paints on top.
+   */
+  /*
+   * Section headings sit directly on the tinted canvas, where label-xs's
+   * slate-500 falls to 3.5:1 at 10px. The 600 shade puts it back to 5.6:1
+   * against the strongest stop.
+   *
+   * The rule is scoped to the canvas rather than changing the label-xs token,
+   * so the same class keeps its lighter weight everywhere else in the app. It
+   * also catches the labels inside this column's white panels, where the same
+   * shade takes them from 4.4:1 to 7.1:1.
+   */
+  .exchange-canvas .label-xs {
+    color: var(--color-slate-600);
+  }
+
+  .exchange-canvas {
+    background-color: var(--color-slate-25);
+    background-image:
+      linear-gradient(var(--color-slate-100) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-slate-100) 1px, transparent 1px),
+      radial-gradient(72% 55% at 6% -4%, hsl(220 84% 92%), transparent 62%),
+      radial-gradient(66% 52% at 94% 2%, hsl(340 86% 93%), transparent 64%),
+      radial-gradient(85% 62% at 48% 104%, hsl(178 72% 92%), transparent 66%);
+    background-size:
+      34px 34px,
+      34px 34px,
+      auto,
+      auto,
+      auto;
+    background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat;
+  }
+
   .focus-ring:focus-visible {
     outline: 2px solid var(--color-brand-500);
     outline-offset: 2px;

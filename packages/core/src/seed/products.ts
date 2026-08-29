@@ -49,7 +49,6 @@ const PRODUCT_IMAGES: Record<string, string> = {
  */
 export const HERO_IMAGES: Record<string, string> = {
   'SHP-TUF-A15': '/products/hero-sherpa.png',
-  'BIZ-ZEPH-G14': '/products/hero-bizgram.png',
   'CHA-LEGION-PRO-5': '/products/hero-challenger.png',
 }
 

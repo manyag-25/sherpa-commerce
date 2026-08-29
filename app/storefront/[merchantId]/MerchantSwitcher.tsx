@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import clsx from 'clsx'
 import type { Merchant } from '@core/schemas'
+import { isDemoStorefront } from './demo-stores'
 
 /**
  * Jump between the three demo storefronts.
@@ -17,7 +18,14 @@ import type { Merchant } from '@core/schemas'
  * a colour key rather than decoration: the reason to click is to watch the
  * page re-theme, so the control should show you what you are switching to.
  *
- * No client JS. Three links and an `aria-current` are enough.
+ * Only the demo storefronts are navigable. The rest stay in the row as
+ * inert placeholders so the switcher still shows the full network the
+ * exchange runs against, without inviting anyone into a page that is not part
+ * of the walkthrough. They render as `<span>`, not a disabled link, because a
+ * disabled link is still focusable in some browsers and announces itself as a
+ * link to a screen reader when it is not one.
+ *
+ * No client JS. Links, spans and an `aria-current` are enough.
  */
 export function MerchantSwitcher({
   merchants,
@@ -32,6 +40,28 @@ export function MerchantSwitcher({
 
       {merchants.map((m) => {
         const active = m.id === currentId
+        const dot = (
+          <span
+            className="h-1.5 w-1.5 shrink-0 rounded-full"
+            style={{ background: `hsl(${m.logoHue} 58% 42%)` }}
+            aria-hidden
+          />
+        )
+        const base = 'inline-flex min-h-11 items-center gap-1.5 rounded-full px-2.5'
+
+        if (!isDemoStorefront(m.id)) {
+          return (
+            <span
+              key={m.id}
+              title="Not part of this walkthrough"
+              className={clsx(base, 'cursor-default text-slate-400 opacity-70')}
+            >
+              {dot}
+              {m.name}
+            </span>
+          )
+        }
+
         return (
           <Link
             key={m.id}
@@ -41,16 +71,13 @@ export function MerchantSwitcher({
             // differ per merchant, so `?brand=Dell` would land on an empty
             // grid at the other store.
             className={clsx(
-              'focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-full px-2.5 transition-colors',
+              base,
+              'focus-ring transition-colors',
               active ? 'font-semibold text-slate-900' : 'text-slate-500 hover:text-slate-900',
             )}
             style={active ? { background: `hsl(${m.logoHue} 76% 93%)` } : undefined}
           >
-            <span
-              className="h-1.5 w-1.5 shrink-0 rounded-full"
-              style={{ background: `hsl(${m.logoHue} 58% 42%)` }}
-              aria-hidden
-            />
+            {dot}
             {m.name}
           </Link>
         )

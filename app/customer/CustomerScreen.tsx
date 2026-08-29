@@ -414,7 +414,7 @@ export function CustomerScreen({
 
       <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[3fr_1fr]">
         {/* ── Backend / market visualization ── */}
-        <div className="grid-bg min-h-0 space-y-3 overflow-auto p-4">
+        <div className="exchange-canvas min-h-0 space-y-3 overflow-auto p-4">
           <SectionLabel>Merchant agents</SectionLabel>
           <MerchantAgents
             merchants={merchants}
@@ -592,7 +592,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2.5 pt-1">
       <span className="label-xs">{children}</span>
-      <div className="h-px flex-1 bg-slate-100" />
+      {/* slate-100 vanishes against the tinted canvas; 200 keeps the rule visible. */}
+      <div className="h-px flex-1 bg-slate-200" />
     </div>
   )
 }

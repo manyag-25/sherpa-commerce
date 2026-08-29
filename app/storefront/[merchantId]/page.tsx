@@ -11,6 +11,7 @@ import { toPublicProduct } from '@core/schemas'
 import { StorefrontChat } from './StorefrontChat'
 import { HeroRibbon } from './HeroRibbon'
 import { HeroObjects } from './HeroObjects'
+import { isDemoStorefront } from './demo-stores'
 import { MerchantSwitcher } from './MerchantSwitcher'
 
 export const dynamic = 'force-dynamic'
@@ -78,6 +79,13 @@ export default async function StorefrontPage({
    * 220 -> 9.7:1), which beats carrying a per-hue exception table.
    */
   const accentSolid = `hsl(${hue} 58% 32%)`
+
+  /*
+   * Only the two stores the demo walks through run the animated hero. See
+   * demo-stores.ts: every other merchant gets the same layout with a static
+   * background, so no page nobody opens is holding a rAF loop open.
+   */
+  const animated = isDemoStorefront(merchant.id)
 
   /* ── Filtering, driven by the URL so it needs no client JS ── */
   const brands = [...new Set(all.map((p) => p.brand))].sort()
@@ -200,11 +208,21 @@ export default async function StorefrontPage({
           * runs on every other surface, so the hero is the one place on the
           * page that is allowed to be atmospheric.
           */}
-        <HeroRibbon
-          hue={hue}
-          className="pointer-events-none absolute inset-x-0 bottom-[-6%] h-[76%] opacity-60"
-        />
-        <HeroObjects hue={hue} />
+        {animated && (
+          <>
+            <HeroRibbon
+              hue={hue}
+              className="pointer-events-none absolute inset-x-0 bottom-[-6%] h-[76%] opacity-60"
+            />
+            <HeroObjects hue={hue} />
+          </>
+        )}
+
+        {/* Placeholders keep the grid texture the hero used to carry, so the
+            section still reads as a designed surface without the canvas. */}
+        {!animated && (
+          <div className="grid-bg pointer-events-none absolute inset-0 opacity-[0.35]" aria-hidden />
+        )}
 
         <div className="relative mx-auto grid max-w-[1200px] items-center gap-8 px-5 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
           <div>
@@ -314,15 +332,9 @@ export default async function StorefrontPage({
                 priority
                 sizes="(max-width: 1024px) 70vw, 340px"
                 aria-hidden
-                className="drift relative w-[62%] max-w-[340px] drop-shadow-[0_26px_40px_rgba(23,28,40,0.18)]"
-                style={
-                  {
-                    '--drift-y': '-20px',
-                    '--drift-rot': '-6deg',
-                    '--drift-spin': '9deg',
-                    '--drift-dur': '12s',
-                  } as React.CSSProperties
-                }
+                // Static. Only placeholder storefronts reach this branch, and
+                // the point of them is to cost nothing.
+                className="relative w-[62%] max-w-[340px] drop-shadow-[0_26px_40px_rgba(23,28,40,0.18)]"
               />
               {cheapest && (
                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full border border-slate-300 bg-white/80 px-3.5 py-1.5 backdrop-blur">
